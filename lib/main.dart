@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crud/addproducts.dart';
+import 'package:firebase_crud/auth.dart';
 import 'package:firebase_crud/firebase_options.dart';
 import 'package:firebase_crud/products.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +27,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyProductsPage(),
+      home: Signup(),
       routes: {
+        '/products':(context)=>MyProductsPage(),
         '/add':(context)=>AddProductPage(),
       },
     );
