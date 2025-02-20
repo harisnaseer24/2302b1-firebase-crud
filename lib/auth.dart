@@ -32,6 +32,8 @@ class _SignupState extends State<Signup> {
 });
   print("user created successfully");
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Registeration success"),)) ;
+  Navigator.pushNamed(context,'/login');
+
 } on FirebaseAuthException catch (e) {
   if (e.code == 'weak-password') {
     print('The password provided is too weak.');
@@ -39,6 +41,7 @@ class _SignupState extends State<Signup> {
   } else if (e.code == 'email-already-in-use') {
     print('The account already exists for that email.');
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("The account already exists for that email."),)) ;
+  Navigator.pushNamed(context,'/login');
     
   } 
 } catch (e) {
@@ -92,5 +95,81 @@ class _SignupState extends State<Signup> {
       )
       ,
     );
+  }
+}
+
+
+class Login extends StatefulWidget {
+  const Login({super.key});
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+   TextEditingController emailController= TextEditingController();
+  TextEditingController passwordController= TextEditingController();
+
+login()async{
+  try {
+  final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+    email: emailController.text,
+    password: passwordController.text
+  );
+   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Signed in as ${emailController.text}"),)) ;
+  Navigator.pushNamed(context,'/products');
+
+} on FirebaseAuthException catch (e) {
+  if (e.code == 'user-not-found') {
+    print('No user found for that email.');
+   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No user found for that email."),)) ;
+  Navigator.pushNamed(context,'/');
+  } else if (e.code == 'wrong-password') {
+    print('Wrong password provided for that user.');
+   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Wrong password provided for that user."),)) ;
+
+  }
+}
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return  Scaffold(
+      appBar: AppBar(title: Text("Login to your account"),),
+      body: 
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ListView(
+          children: [
+               SizedBox(height: 20,),
+
+           
+          
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                label: Text("Enter your Email"),
+                hintText: "Email",
+                border: OutlineInputBorder(),
+              ),
+            ),
+              SizedBox(height: 20,),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(
+                label: Text("Enter your password"),
+                hintText: "Password",
+                border: OutlineInputBorder(),
+              ),),
+              SizedBox(height: 20,),
+              ElevatedButton(onPressed: (){
+                login();
+              }, child: Text("Login"))
+            
+          ],
+        ),
+      )
+      ,
+    );;
   }
 }
