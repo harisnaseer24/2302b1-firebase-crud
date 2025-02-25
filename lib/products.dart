@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyProductsPage extends StatefulWidget {
+
   const MyProductsPage({super.key});
 
   @override
@@ -12,6 +13,19 @@ class MyProductsPage extends StatefulWidget {
 }
 
 class _MyProductsPageState extends State<MyProductsPage> {
+String userEmail="";
+
+getUserDetails() async{
+
+   final SharedPreferences prefs = await SharedPreferences.getInstance();
+   
+
+   setState(() {
+     userEmail=prefs.getString("email")!;
+     print(userEmail);
+   });
+}
+
   CollectionReference products= FirebaseFirestore.instance.collection('products');
   _deleteProduct(String productId)async{
     try{
@@ -84,11 +98,17 @@ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product delet
 
   
   @override
+  initState(){
+    getUserDetails();
+    print(userEmail);
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Products"),
+        title: Text("Products "),
         actions: [
+          userEmail !=null ? Text(userEmail):Text("no"),
+
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {

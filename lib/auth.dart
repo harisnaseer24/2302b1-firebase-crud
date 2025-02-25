@@ -118,9 +118,13 @@ login()async{
     email: emailController.text,
     password: passwordController.text
   );
+  // var user=await 
 
   prefs.setBool("isLoggedIn",true);
   prefs.setString("email", emailController.text);
+  prefs.setString("id", credential.user?.uid ?? "");
+ 
+
   print("user session is created");
    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Signed in as ${emailController.text}"),)) ;
   Navigator.pushNamed(context,'/');
