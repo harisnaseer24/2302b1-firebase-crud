@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -111,15 +112,23 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController= TextEditingController();
 
 login()async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
   try {
   final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
     email: emailController.text,
     password: passwordController.text
   );
+
+  prefs.setBool("isLoggedIn",true);
+  prefs.setString("email", emailController.text);
+  print("user session is created");
    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Signed in as ${emailController.text}"),)) ;
-  Navigator.pushNamed(context,'/products');
+  Navigator.pushNamed(context,'/');
 
 } on FirebaseAuthException catch (e) {
+
+   prefs.setBool("isLoggedIn",false);
+   print("user unset");
   if (e.code == 'user-not-found') {
     print('No user found for that email.');
    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No user found for that email."),)) ;

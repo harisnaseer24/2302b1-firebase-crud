@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crud/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyProductsPage extends StatefulWidget {
   const MyProductsPage({super.key});
@@ -96,7 +98,10 @@ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product delet
             icon: Icon(Icons.logout),
             onPressed: () async{
               await FirebaseAuth.instance.signOut();
-              Navigator.pushNamed(context,"/login");
+              final SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setBool("isLoggedIn",false);
+              prefs.remove("email");
+              Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>Login()));
             }),
         ],
       ),

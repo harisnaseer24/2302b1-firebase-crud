@@ -4,17 +4,25 @@ import 'package:firebase_crud/auth.dart';
 import 'package:firebase_crud/firebase_options.dart';
 import 'package:firebase_crud/products.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+final SharedPreferences prefs = await SharedPreferences.getInstance();
+bool isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
+print(isLoggedIn);
+
+
+  runApp(MyApp(isLoggedIn:isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key,required this.isLoggedIn});
 
   // This widget is the root of your application.
   @override
@@ -27,11 +35,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Signup(),
+      home: isLoggedIn ? MyProductsPage() : Login(),
       routes: {
+        '/signup':(context)=>Signup(),
         '/login':(context)=>Login(),
-        '/products':(context)=>MyProductsPage(),
-        '/add':(context)=>AddProductPage(),
+        '/products':(context)=>isLoggedIn ? MyProductsPage() : Login(),
+        '/add':(context)=>isLoggedIn ? AddProductPage() : Login(),
       },
     );
   }
