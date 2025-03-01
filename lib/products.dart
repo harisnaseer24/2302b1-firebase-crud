@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crud/auth.dart';
@@ -14,6 +16,7 @@ class MyProductsPage extends StatefulWidget {
 
 class _MyProductsPageState extends State<MyProductsPage> {
 String userEmail="";
+String userName="";
 
 getUserDetails() async{
 
@@ -22,6 +25,7 @@ getUserDetails() async{
 
    setState(() {
      userEmail=prefs.getString("email")!;
+     userName=prefs.getString("username")!;
      print(userEmail);
    });
 }
@@ -107,7 +111,7 @@ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product delet
       appBar: AppBar(
         title: Text("Products "),
         actions: [
-          userEmail !=null ? Text(userEmail):Text("no"),
+          userName !=null ? Text(userName):Text("no"),
 
           IconButton(
             icon: Icon(Icons.add),
@@ -141,7 +145,7 @@ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product delet
                   title: Text(snapshot.data!.docs[index]['title']),
                   subtitle: Text(snapshot.data!.docs[index]['description']),
                   leading: CircleAvatar(
-                    child: Image.network(snapshot.data!.docs[index]['image'],height: 40,),
+                    child: Image.memory(base64Decode(snapshot.data!.docs[index]['image']),height: 40,),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,

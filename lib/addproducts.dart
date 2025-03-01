@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -13,8 +17,29 @@ class _AddProductPageState extends State<AddProductPage> {
   TextEditingController titleController=TextEditingController();
   TextEditingController desController=TextEditingController();
   TextEditingController priceController=TextEditingController();
-  TextEditingController imageController=TextEditingController();
-  
+  // TextEditingController imageController=TextEditingController();
+  String imgUrl="";
+  final ImagePicker picker = ImagePicker();
+getImage()async{
+    // final ImagePicker picker = ImagePicker();
+final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+final Uint8List byteImage=await image!.readAsBytes();
+//image--> [12,121,25454,2187,88785,854577,4,4,878,45,4,.....]
+print(byteImage);
+//base 64 algorithm
+final String base64img=base64Encode(byteImage);
+print(base64img);
+setState(() {
+  imgUrl=base64img;
+});
+
+
+}
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,14 +79,16 @@ class _AddProductPageState extends State<AddProductPage> {
                   hintText: "Enter the price of the product",
                 ),
               ),
-              TextField(
-                controller: imageController,
-                decoration: InputDecoration(
-                  labelText: "Image URL",
-                  hintText: "Enter the image URL of the product",
-                ),
-              ),
-              ElevatedButton(
+             
+             ElevatedButton(onPressed:
+             (){
+              getImage();
+             }
+             
+             , child: Text("Choose File")),
+                           
+                           
+                           ElevatedButton(
                 onPressed: () {
                   // Add the product to the database
 
@@ -69,14 +96,14 @@ class _AddProductPageState extends State<AddProductPage> {
                     'title':titleController.text,
                     'description':desController.text,
                     'price':double.parse(priceController.text),
-                    'image':imageController.text,
+                    'image':imgUrl,
 
                     
                   }).then((value) => {
                     titleController.clear(),
                     desController.clear(),
                     priceController.clear(),
-                    imageController.clear(),
+                    // imageController.clear(),
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product added successfully"),)) ,
 
                     Navigator.pop(context),

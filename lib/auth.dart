@@ -30,6 +30,7 @@ class _SignupState extends State<Signup> {
 "password":passwordController.text,
 "username":usernameController.text,
 "id":credential.user?.uid,
+"role":"user",
 });
   print("user created successfully");
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Registeration success"),)) ;
@@ -118,10 +119,13 @@ login()async{
     email: emailController.text,
     password: passwordController.text
   );
-  // var user=await 
+  var user=await FirebaseFirestore.instance.collection("users").where("email",isEqualTo: emailController.text).get();
+  String username=user.docs[0].data()["username"];
+  // print(user.docs[0].data()["username"]);
 
   prefs.setBool("isLoggedIn",true);
   prefs.setString("email", emailController.text);
+  prefs.setString("username", username);
   prefs.setString("id", credential.user?.uid ?? "");
  
 
