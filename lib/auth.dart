@@ -34,7 +34,7 @@ class _SignupState extends State<Signup> {
 });
   print("user created successfully");
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Registeration success"),)) ;
-  Navigator.pushNamed(context,'/login');
+  Navigator.pushNamed(context,'/');
 
 } on FirebaseAuthException catch (e) {
   if (e.code == 'weak-password') {
@@ -43,7 +43,7 @@ class _SignupState extends State<Signup> {
   } else if (e.code == 'email-already-in-use') {
     print('The account already exists for that email.');
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("The account already exists for that email."),)) ;
-  Navigator.pushNamed(context,'/login');
+  Navigator.pushNamed(context,'/');
     
   } 
 } catch (e) {
@@ -90,7 +90,13 @@ class _SignupState extends State<Signup> {
               SizedBox(height: 20,),
               ElevatedButton(onPressed: (){
                 signup();
-              }, child: Text("Signup"))
+              }, child: Text("Signup")),
+               GestureDetector(
+                onTap: (){
+                   Navigator.pushNamed(context,'/');
+                },
+                child: Center(child: Text("Already a user..? Login now..!",)),
+              ),
             
           ],
         ),
@@ -121,9 +127,21 @@ login()async{
   );
   var user=await FirebaseFirestore.instance.collection("users").where("email",isEqualTo: emailController.text).get();
   String username=user.docs[0].data()["username"];
-  // print(user.docs[0].data()["username"]);
 
-  prefs.setBool("isLoggedIn",true);
+  if(user.docs[0].data()['role']=="admin"){
+    prefs.setBool("isAdmin",true);
+      prefs.setBool("isLoggedIn",true);
+  prefs.setString("email", emailController.text);
+  prefs.setString("username", username);
+  prefs.setString("id", credential.user?.uid ?? "");
+ 
+
+  print("admin logged in");
+   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Signed in as ${emailController.text}"),)) ;
+  Navigator.pushNamed(context,'/add');
+  }else{
+    prefs.setBool("isAdmin",false);
+      prefs.setBool("isLoggedIn",true);
   prefs.setString("email", emailController.text);
   prefs.setString("username", username);
   prefs.setString("id", credential.user?.uid ?? "");
@@ -131,7 +149,11 @@ login()async{
 
   print("user session is created");
    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Signed in as ${emailController.text}"),)) ;
-  Navigator.pushNamed(context,'/');
+  Navigator.pushNamed(context,'/products');
+
+  }
+  // print(user.docs[0].data()["username"]);
+
 
 } on FirebaseAuthException catch (e) {
 
@@ -181,7 +203,13 @@ login()async{
               SizedBox(height: 20,),
               ElevatedButton(onPressed: (){
                 login();
-              }, child: Text("Login"))
+              }, child: Text("Login")),
+              GestureDetector(
+                onTap: (){
+                   Navigator.pushNamed(context,'/signup');
+                },
+                child: Text("Not a user..? Register now..!",),
+              ),
             
           ],
         ),
